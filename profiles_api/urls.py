@@ -7,6 +7,7 @@ router.register('signup', views.UserProfileViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('nickname/', views.NicknameAPIView.as_view()),
     path('login/', views.UserLoginApiView.as_view()),
     path('password/reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 ]

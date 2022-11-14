@@ -32,3 +32,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             instance.set_password(password) #Hash password 
  
         return super().update(instance, validated_data)
+
+class NicknameSerializer(serializers.ModelSerializer):
+    """Serializes a user profile object"""
+    class Meta:
+        model = models.UserProfile
+        fields = ('nickname',)
