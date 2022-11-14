@@ -6,7 +6,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 # Create your views here.
 
@@ -47,3 +47,14 @@ class NicknameAPIView(APIView):
                 serializer.errors,
                 status= status.HTTP_400_BAD_REQUEST
             )
+
+class DeleteUserAPIView(APIView):
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAdminUser, )
+
+    def get(self, request, format = None):
+        try:
+            user_obj = models.UserProfile.objects.get(email = request.query_params['email']).delete()
+            return Response({"message" : "The book record has been deleted successfully."})
+        except Exception as e:
+            return Response({"error": str(e)})
