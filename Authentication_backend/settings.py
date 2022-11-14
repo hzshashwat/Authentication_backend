@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'profiles_api'
+    'profiles_api',
+    'django_rest_passwordreset'
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'profiles_api.UserProfile'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
