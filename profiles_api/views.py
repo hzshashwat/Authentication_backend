@@ -37,7 +37,6 @@ class NicknameAPIView(APIView):
 
         if serializer.is_valid():
             nickname = serializer.validated_data.get('nickname')
-            message = f'Hello {nickname}'
             user_entry = models.UserProfile.objects.get(id = request.user.id)
             user_entry.nickname=nickname
             user_entry.save()
@@ -56,5 +55,18 @@ class DeleteUserAPIView(APIView):
         try:
             user_obj = models.UserProfile.objects.get(email = request.query_params['email']).delete()
             return Response({"message" : "The book record has been deleted successfully."})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+class MakeAdminAPIView(APIView):
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAdminUser, )
+
+    def get(self, request, format = None):
+        try:
+            user_obj = models.UserProfile.objects.get(email = request.query_params['email'])
+            user_obj.is_staff = True
+            user_obj.save()
+            return Response({"message" : "Admin Access Granted"})
         except Exception as e:
             return Response({"error": str(e)})
