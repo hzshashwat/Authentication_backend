@@ -34,13 +34,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class NicknameSerializer(serializers.ModelSerializer):
-    """Serializes a user profile object"""
     class Meta:
         model = models.UserProfile
         fields = ('nickname',)
 
 class ForgetPasswordSerializer(serializers.ModelSerializer):
-    """Serializes a user profile object"""
     class Meta:
         model = models.TokenModel
         fields = ('user',)
