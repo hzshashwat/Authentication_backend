@@ -7,6 +7,8 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+import uuid
+from profiles_api.helpers import send_forget_password_mail
 
 # Create your views here.
 
@@ -68,5 +70,27 @@ class MakeAdminAPIView(APIView):
             user_obj.is_staff = True
             user_obj.save()
             return Response({"message" : "Admin Access Granted"})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+class ForgetPassword(APIView):
+    serializer_class = serializers.ForgetPasswordSerializer
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        try:
+            if serializer.is_valid():
+                email = serializer.validated_data.get('email')
+                
+                if not models.UserProfile.objects.filter(email=email).first():
+                    return Response({'message' : 'No user found with this email.'})
+                
+                user_obj = models.UserProfile.objects.get(email = email)
+                token = str(uuid.uuid4())
+                profile_obj= models.TokenModel.objects.get(user = user_obj)
+                profile_obj.forget_password_token = token
+                profile_obj.save()
+                send_forget_password_mail(user_obj.email , token)
+                return Response({"message" : "Email with reset link sent."})
+        
         except Exception as e:
             return Response({"error": str(e)})

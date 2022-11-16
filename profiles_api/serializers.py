@@ -38,3 +38,14 @@ class NicknameSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserProfile
         fields = ('nickname',)
+
+class ForgetPasswordSerializer(serializers.ModelSerializer):
+    """Serializes a user profile object"""
+    class Meta:
+        model = models.TokenModel
+        fields = ('user',)
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TokenModel
+        fields = ('forget_password_token',)

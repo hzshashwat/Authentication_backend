@@ -10,5 +10,6 @@ urlpatterns = [
     path('nickname/', views.NicknameAPIView.as_view()),
     path('login/', views.UserLoginApiView.as_view()),
     path('admin/delete/', views.DeleteUserAPIView.as_view()),
-    path('admin/make_admin/', views.MakeAdminAPIView.as_view())
+    path('admin/make_admin/', views.MakeAdminAPIView.as_view()),
+    path('password/reset/', views.ForgetPassword.as_view())
 ]
