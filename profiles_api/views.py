@@ -7,6 +7,8 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+import uuid
+from profiles_api.helpers import send_forget_password_mail
 
 # Create your views here.
 
@@ -68,5 +70,57 @@ class MakeAdminAPIView(APIView):
             user_obj.is_staff = True
             user_obj.save()
             return Response({"message" : "Admin Access Granted"})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+class ForgetPassword(APIView):
+    serializer_class = serializers.ForgetPasswordSerializer
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        try:
+            email = serializer.initial_data['email']
+            
+            if not models.UserProfile.objects.filter(email=email).first():
+                return Response({'message' : 'No user found with this email.'})
+            
+            user_obj = models.UserProfile.objects.get(email = email)
+            token = str(uuid.uuid4())
+
+            if models.TokenModel.objects.filter(user = user_obj).exists():
+                profile_obj= models.TokenModel.objects.get(user = user_obj)
+            else:
+                profile_obj= models.TokenModel.objects.create(user = user_obj)
+
+            profile_obj.forget_password_token = token
+            profile_obj.save()
+            send_forget_password_mail(user_obj.email , token)
+            return Response({"message" : "Email sent with reset password link."})
+        
+        except Exception as e:
+            return Response({"error": str(e)})
+
+class ChangePassword(APIView):
+    serializer_class = serializers.ResetPasswordSerializer
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        try:
+            profile_obj = models.TokenModel.objects.filter(forget_password_token = request.query_params['token']).first()
+            if serializer.is_valid():
+                new_password = serializer.validated_data.get('new_password')
+                confirm_password = serializer.validated_data.get('confirm_password')
+                user_id = profile_obj.user.id
+                
+                if user_id is  None:
+                    return Response({"message" : "No user id found."})
+                
+                if  new_password != confirm_password:
+                    return Response({"message" : "Password not same."})
+                            
+                
+                user_obj = models.UserProfile.objects.get(id = user_id)
+                user_obj.set_password(new_password)
+                user_obj.save()
+                return Response({"message" : "Password changed successfully."})
+            
         except Exception as e:
             return Response({"error": str(e)})

@@ -34,7 +34,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class NicknameSerializer(serializers.ModelSerializer):
-    """Serializes a user profile object"""
     class Meta:
         model = models.UserProfile
         fields = ('nickname',)
+
+class ForgetPasswordSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=100)
+
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(max_length=100)
+    confirm_password = serializers.CharField(max_length=100)
