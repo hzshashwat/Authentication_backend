@@ -79,7 +79,7 @@ class ForgetPassword(APIView):
         serializer = self.serializer_class(data=request.data)
         try:
             if serializer.is_valid():
-                email = serializer.validated_data.get('email')
+                email = serializer.validated_data.get('user')
                 
                 if not models.UserProfile.objects.filter(email=email).first():
                     return Response({'message' : 'No user found with this email.'})
