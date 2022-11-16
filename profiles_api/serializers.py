@@ -38,12 +38,9 @@ class NicknameSerializer(serializers.ModelSerializer):
         model = models.UserProfile
         fields = ('nickname',)
 
-class ForgetPasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.TokenModel
-        fields = ('user',)
+class ForgetPasswordSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=100)
 
-class ResetPasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.TokenModel
-        fields = ('forget_password_token',)
+class ResetPasswordSerializer(serializers.Serializer):
+    NewPassword = serializers.CharField(max_length=100)
+    ConfirmPassword = serializers.CharField(max_length=100)
