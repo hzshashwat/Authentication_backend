@@ -42,5 +42,5 @@ class ForgetPasswordSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=100)
 
 class ResetPasswordSerializer(serializers.Serializer):
-    NewPassword = serializers.CharField(max_length=100)
-    ConfirmPassword = serializers.CharField(max_length=100)
+    new_password = serializers.CharField(max_length=100)
+    confirm_password = serializers.CharField(max_length=100)

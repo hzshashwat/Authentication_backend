@@ -106,8 +106,8 @@ class ChangePassword(APIView):
         try:
             profile_obj = models.TokenModel.objects.filter(forget_password_token = request.query_params['token']).first()
             if serializer.is_valid():
-                new_password = serializer.validated_data.get('NewPassword')
-                confirm_password = serializer.validated_data.get('ConfirmPassword')
+                new_password = serializer.validated_data.get('new_password')
+                confirm_password = serializer.validated_data.get('confirm_password')
                 user_id = profile_obj.user.id
                 
                 if user_id is  None:
