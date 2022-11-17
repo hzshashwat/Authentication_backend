@@ -12,5 +12,5 @@ urlpatterns = [
     path('admin/delete/', views.DeleteUserAPIView.as_view()),
     path('admin/make_admin/', views.MakeAdminAPIView.as_view()),
     path('password/reset/', views.ForgetPassword.as_view()),
-    path('password/reset/c/', views.ChangePassword.as_view())
+    path('password/reset/token/', views.ChangePassword.as_view())
 ]
