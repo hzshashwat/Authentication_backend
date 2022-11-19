@@ -134,8 +134,9 @@ class BookApiView(APIView):
 def IssueBookView(request) :
     if request.method == 'GET':
         try:
-            book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
-            book.inventory -= 1
+            book = Book.objects.filter(name = request.user).get(isbn_no = request.query_params['isbn_no'])
+            print(book)
+            book.inventory += 1
             book.save()
             return Response({"message" : "Book issued successfully and Inventory updated."})
         except Exception as e:
