@@ -56,7 +56,7 @@ class DeleteUserAPIView(APIView):
     def get(self, request, format = None):
         try:
             user_obj = models.UserProfile.objects.get(email = request.query_params['email']).delete()
-            return Response({"message" : "The book record has been deleted successfully."})
+            return Response({"message" : "User Deleted Successfully"})
         except Exception as e:
             return Response({"error": str(e)})
 

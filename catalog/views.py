@@ -130,12 +130,17 @@ class BookApiView(APIView):
         except Exception as e:
             return Response({"error": str(e)})
 
-@api_view(['GET'])
-def IssueBookView(request) :
-    if request.method == 'GET':
+
+class IssueBookApiView(APIView):
+    serializer_class = BookSerializers
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (
+            IsAuthenticatedOrReadOnly,
+        )
+
+    def get(self, request, format = None):
         try:
             book = Book.objects.filter(name = request.user).get(isbn_no = request.query_params['isbn_no'])
-            print(book)
             book.inventory += 1
             book.save()
             return Response({"message" : "Book issued successfully and Inventory updated."})
