@@ -78,81 +78,57 @@ def UnavailableBooksView(request):
         except Exception as e:
             return Response({"error": str(e)})
 
-class BookViewSet(viewsets.ModelViewSet):
-    """Handles creating, reading and updating profile feed items"""
-    authentication_classes = (TokenAuthentication, ) 
+class BookApiView(APIView):
     serializer_class = BookSerializers
+    authentication_classes = (TokenAuthentication, )
     permission_classes = (
-        IsAuthenticated,
-    )
+            IsAuthenticatedOrReadOnly,
+        )
 
-    def get_queryset(self):
-        user = self.request.user
-        book = Book.objects.filter(name = user)
-        return book
+    def get(self, request, format = None):
+        try:
+            book = Book.objects.filter(name = self.request.user).filter(isbn_no = request.query_params['isbn_no'])
+            bookjson = BookSerializers(book, many=True)
 
-    def perform_create(self, serializer):
-        """Sets the user profile to the logged in user"""
-        serializer.save(name = self.request.user)
+            return Response({"message" : [bookjson.data]})
 
-    def destroy(self, request, pk=None):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({"error": str(e)})
 
-    def perform_destroy(self, instance):
-        instance.delete()
+    def put(self, request):
+        book = Book.objects.filter(name = self.request.user).get(isbn_no = request.query_params['isbn_no'])
+        try :
+            bookobj = ChangeRecordSerializer(book, data=request.data)
+            if bookobj.is_valid():
+                bookobj.save()
+                return Response({"message" : "Book record replaced successfully."})
+            else :
+                return Response({"message": bookobj.errors,
+                "status": "Failed"
+                })
+        except Exception as e:
+            return Response({"message": str(e)})
 
-# @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-# @permission_classes([IsAdminUser])
-# def BookView(request):
-#     if request.method == 'GET' :
-#         try:
-#             book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
-#             bookjson = BookSerializers(book, many=False)
-#             if bookjson.is_valid() == True:
-#                 return Response({"message" : [bookjson.data]})
-#             else:
-#                 return Response({"message": bookjson.errors,
-#                 "status": "Failed"
-#                 })
-#         except Exception as e:
-#             return Response({"error": str(e)})
+    def patch(self, request):
+        book = Book.objects.filter(name = self.request.user).get(isbn_no = request.query_params['isbn_no'])
+        try :
+            bookobj = UpdateRecordSerializers(book, data=request.data)
+            if bookobj.is_valid():
+                bookobj.save()
+                return Response({"message" : "Book record updated successfully."})
+            else :
+                return Response({"message": bookobj.errors,
+                "status": "Failed"
+                })
+        except Exception as e:
+            return Response({"message": str(e)})
 
-#     elif request.method == 'PUT' :
-#         book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
-#         try :
-#             bookobj = ChangeRecordSerializer(book, data=request.data)
-#             if bookobj.is_valid():
-#                 bookobj.save()
-#                 return Response({"message" : "Book record replaced successfully."})
-#             else :
-#                 return Response({"message": bookobj.errors,
-#                 "status": "Failed"
-#                 })
-#         except Exception as e:
-#             return Response({"message": str(e)})
-    
-#     elif request.method == 'PATCH' :
-#         book = Book.objects.get(isbn_no = request.query_params['isbn_no'])
-#         try :
-#             bookobj = UpdateRecordSerializers(book, data=request.data)
-#             if bookobj.is_valid():
-#                 bookobj.save()
-#                 return Response({"message" : "Book record updated successfully."})
-#             else :
-#                 return Response({"message": bookobj.errors,
-#                 "status": "Failed"
-#                 })
-#         except Exception as e:
-#             return Response({"message": str(e)})
-
-#     elif request.method == 'DELETE' :
-#         try:
-#             book = Book.objects.get(isbn_no = request.query_params['isbn_no']).delete()
-#             return Response({"message" : "The book record has been deleted successfully."})
-#         except Exception as e:
-#             return Response({"error": str(e)})
+    def delete(self, request):
+        try:
+            book = Book.objects.filter(name = self.request.user).get(isbn_no = request.query_params['isbn_no']).delete()
+            return Response({"message" : "The book record has been deleted successfully."})
+        except Exception as e:
+            return Response({"error": str(e)})
 
 @api_view(['GET'])
 def IssueBookView(request) :
